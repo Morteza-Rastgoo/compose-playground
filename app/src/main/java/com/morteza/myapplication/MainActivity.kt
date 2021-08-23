@@ -53,43 +53,52 @@ class MainActivity : ComponentActivity() {
 @ExperimentalFoundationApi
 @Composable
 fun Greeting(name: String, lastname: String) {
-    Column(Modifier.fillMaxWidth()) {
-        topGreeting(name)
-        chipSection(chips = listOf("Sweet sleep", "Insomnia", "Depression"))
-        CurrentMeditation()
-        FeatureSection(
-            listOf(
-                Feature(
-                    title = "Compare to the world",
-                    R.drawable.stat_sys_headset,
-                    OrangeYellow1,
-                    OrangeYellow2,
-                    OrangeYellow3,
-                ),
-                Feature(
-                    title = "Sleep meditation",
-                    R.drawable.stat_notify_call_mute,
-                    BlueViolet1,
-                    BlueViolet2,
-                    BlueViolet3
-                ),
-                Feature(
-                    title = "Concentrate deep",
-                    R.drawable.ic_menu_recent_history,
-                    LightGreen1,
-                    LightGreen2,
-                    LightGreen3,
-                ),
-                Feature(
-                    title = "Deep work",
-                    R.drawable.stat_sys_speakerphone,
-                    Beige1,
-                    Beige2,
-                    Beige3,
-                ),
+    Box() {
+        Column(Modifier.fillMaxSize()) {
+            topGreeting(name)
+            chipSection(chips = listOf("Sweet sleep", "Insomnia", "Depression"))
+            CurrentMeditation()
+            FeatureSection(
+                listOf(
+                    Feature(
+                        title = "Compare to the world",
+                        R.drawable.stat_sys_headset,
+                        OrangeYellow1,
+                        OrangeYellow2,
+                        OrangeYellow3,
+                    ),
+                    Feature(
+                        title = "Sleep meditation",
+                        R.drawable.stat_notify_call_mute,
+                        BlueViolet1,
+                        BlueViolet2,
+                        BlueViolet3
+                    ),
+                    Feature(
+                        title = "Concentrate deep",
+                        R.drawable.ic_menu_recent_history,
+                        LightGreen1,
+                        LightGreen2,
+                        LightGreen3,
+                    ),
+                    Feature(
+                        title = "Deep work",
+                        R.drawable.stat_sys_speakerphone,
+                        Beige1,
+                        Beige2,
+                        Beige3,
+                    ),
+                )
             )
-        )
-        post(name, lastname)
+            post(name, lastname)
+        }
+        BottomMenu(items = listOf(
+            BottomMenuContent("Home", R.drawable.ic_menu_recent_history),
+            BottomMenuContent("Meditate", R.drawable.ic_menu_agenda),
+            BottomMenuContent("Sleep", R.drawable.ic_menu_edit),
+            BottomMenuContent("Music", R.drawable.ic_menu_myplaces),
+            BottomMenuContent("Profile", R.drawable.ic_menu_more),
+        ), modifier = Modifier.align(Alignment.BottomCenter))
     }
 }
 
@@ -289,6 +298,75 @@ fun FeatureItem(feature: Feature) {
     }
 }
 
+@Composable
+fun BottomMenu(
+    items: List<BottomMenuContent>,
+    modifier: Modifier = Modifier,
+    activeHighlightColor: Color = ButtonBlue,
+    activeTextColor: Color = Color.White,
+    inactiveTextColor: Color = AquaBlue,
+    initialSelectedItemIndex: Int = 0
+) {
+    var selectedItemIndex by remember {
+        mutableStateOf(initialSelectedItemIndex)
+    }
+    Row(
+        horizontalArrangement = Arrangement.SpaceAround,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = modifier
+            .fillMaxWidth()
+            .background(DeepBlue)
+            .padding(5.dp)
+    ) {
+        items.forEachIndexed { index, item ->
+            BottomMenuItem(
+                item = item,
+                isSelected = index == selectedItemIndex,
+                activeHighlightColor = activeHighlightColor,
+                activeTextColor = activeTextColor,
+                inactiveTextColor = inactiveTextColor
+            ) {
+                selectedItemIndex = index
+            }
+        }
+    }
+}
+@Composable
+fun BottomMenuItem(
+    item: BottomMenuContent,
+    isSelected: Boolean = false,
+    activeHighlightColor: Color = ButtonBlue,
+    activeTextColor: Color = Color.White,
+    inactiveTextColor: Color = AquaBlue,
+    onItemClick: () -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.clickable {
+            onItemClick()
+        }
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .clip(RoundedCornerShape(10.dp))
+                .background(if (isSelected) activeHighlightColor else Color.Transparent)
+                .padding(10.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = item.iconId),
+                contentDescription = item.title,
+                tint = if (isSelected) activeTextColor else inactiveTextColor,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+        Text(
+            text = item.title,
+            color = if(isSelected) activeTextColor else inactiveTextColor
+        )
+    }
+}
 
 @Composable
 private fun post(name: String, lastname: String) {
